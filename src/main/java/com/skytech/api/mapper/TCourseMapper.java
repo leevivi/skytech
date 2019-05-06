@@ -10,4 +10,6 @@ import org.apache.ibatis.annotations.Param;
 
 public interface TCourseMapper extends GenericOneMapper<TCourse,TCourseExample,Integer>{
     List<Integer> selectCourseWeek(@Param("courseId") Map<String,Integer> courseId, @Param("month") Map<String,String> month);
+    String queryMaxMonth(@Param("accountSid") String accountSid);
+    Integer queryByOrderDetail(@Param("courseId") Integer courseId);
 }

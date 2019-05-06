@@ -5,6 +5,8 @@ import com.skytech.api.core.Pagination;
 import com.skytech.api.core.service.GenericService;
 import com.skytech.api.model.RunningRecord;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 public interface RunningRecordService extends GenericService<RunningRecord, String> {
@@ -22,6 +24,10 @@ public interface RunningRecordService extends GenericService<RunningRecord, Stri
     int getNewest(String accountSid);
 
     Map<String, Object> getCurrentData(String accountSid);
+
+    List<RunningRecord> findForTime(String deviceSid, Date recordTime);
+
+
 }
 
 

@@ -58,6 +58,8 @@ public class CourseController{
     private TCourseMapper tCourseMapper;
     @Autowired
     private TCouponMembersMapper tCouponMembersMapper;
+    @Autowired
+    private TCourseTimeMapper tCourseTimeMapper;
 
 
     @ApiOperation(value = "列表")
@@ -71,6 +73,7 @@ public class CourseController{
         Object accountSidObj = session.getAttribute("accountSid");
 
         String accountSid = accountSidObj.toString();
+        String maxMonth = tCourseMapper.queryMaxMonth(accountSid);
         //保存会员健身会所公司门店id
         Map<String, Object> memberInfoData = new HashMap<>();
         List<Pagination<TCourse>> paginationList = new ArrayList<>();
@@ -80,6 +83,7 @@ public class CourseController{
         int memberId = 0;
         int companyId = 0;
         int storesId = 0;
+        int totalNum = 0;
         try {
             memberList = (List<MemberInfo>) memberInfoData.get("memberInfoList");
             //根据公司和门店去重
@@ -87,7 +91,17 @@ public class CourseController{
             for (MemberInfo memberInfo : distinctClass) {
                 companyId = memberInfo.getCompanyId();
                 storesId = memberInfo.getStoresId();
-                Pagination<TCourse> pagination = courseService.findForPage(companyId,storesId,page, limit);
+                Pagination<TCourse> pagination = courseService.findForPage(companyId,storesId,maxMonth,page, limit);
+                List<TCourse> dataList = pagination.getDataList();
+                for (TCourse tc :dataList) {
+                    TCourseTimeExample tCourseTimeExample = new TCourseTimeExample();
+                    tCourseTimeExample.createCriteria().andCourseidEqualTo(tc.getId());
+                    List<TCourseTime> tCourseTimes = tCourseTimeMapper.selectByExample(tCourseTimeExample);
+                    if(!tCourseTimes.isEmpty()){
+                        totalNum = tc.getUpper()*tCourseTimes.size();
+                    }
+                }
+
                 paginationList.add(pagination);
             }
         }catch (Exception e){

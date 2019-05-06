@@ -14,7 +14,7 @@ import java.util.Map;
  * Created by LiWei on 2019/3/31.
  */
 public interface CourseService extends GenericOneService<TCourse,Integer> {
-    Pagination<TCourse> findForPage(int companyId,int storesId,int page, int limit);
+    Pagination<TCourse> findForPage(int companyId,int storesId,String maxMonth,int page, int limit);
 
     List<Map<String, Object>> findForCourse(int courseId);
 

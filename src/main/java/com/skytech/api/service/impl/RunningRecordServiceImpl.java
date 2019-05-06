@@ -44,6 +44,24 @@ public class RunningRecordServiceImpl extends GenericServiceImpl<RunningRecord, 
     }
 
     @Override
+    public List<RunningRecord> findForTime(String deviceSid, Date recordTime) {
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(recordTime);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        Date startDate = calendar.getTime();
+
+        calendar.add(Calendar.DATE, 1);
+        Date endDate = calendar.getTime();
+        List<RunningRecord> runningRecords = runningRecordMapper.findForTime(deviceSid,startDate,endDate);
+        return runningRecords;
+    }
+
+
+
+    @Override
     public JsonMap save(RunningRecord runningRecord) {
         Account account = accountMapper.selectByPrimaryKey(runningRecord.getAccountSid());
         runningRecord.setAccountName(account.getFirstName() + account.getLastName());
@@ -173,6 +191,8 @@ public class RunningRecordServiceImpl extends GenericServiceImpl<RunningRecord, 
         data.put("cal", cal);
         return data;
     }
+
+
 
     @Override
     public int getNewest(String accountSid) {

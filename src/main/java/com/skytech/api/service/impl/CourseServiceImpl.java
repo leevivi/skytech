@@ -63,10 +63,10 @@ public class CourseServiceImpl extends GenericOneServiceImpl<TCourse,TCourseExam
     }
 
     @Override
-    public Pagination<TCourse> findForPage(int companyId, int storesId, int page, int limit) {
+    public Pagination<TCourse> findForPage(int companyId, int storesId,String maxMonth, int page, int limit) {
         TCourseExample tCourseExample = new TCourseExample();
         BaseTCourseExample.Criteria criteria = tCourseExample.createCriteria();
-        criteria.andCompanyidEqualTo(companyId).andStoresidEqualTo(storesId).andStatusEqualTo(0).andMonthGreaterThanOrEqualTo(DateUtil.formatmiddledatestr(new Date()));
+        criteria.andCompanyidEqualTo(companyId).andStoresidEqualTo(storesId).andStatusEqualTo(0).andMonthBetween(DateUtil.formatmiddledatestr(new Date()),maxMonth);
         Pagination<TCourse> pagination = this.queryByPage(tCourseExample, (page - 1) * limit, limit, "createtime desc");
 
         return pagination;

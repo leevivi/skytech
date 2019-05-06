@@ -1,5 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.skytech.api.mapper.RunningRecordMapper" >
+<select id="findForTime" resultMap="BaseResultMap">
+    SELECT
+	*
+FROM
+	running_record r
+WHERE
+	r.account_sid = #{accountSid}
+AND r.device_sid IS NOT NULL
+AND LENGTH(TRIM(r.device_sid))<![CDATA[ >= ]]>1
+AND r.created_datetime BETWEEN #{startTime}
+AND #{endTime}
+ORDER BY r.created_datetime DESC
+</select>
 
+    <select id="getRecordDate" resultType="java.lang.String">
+        SELECT
+	DISTINCT DATE_FORMAT(r.created_datetime,"%Y-%m-%d") as recordDate
+FROM
+	running_record r
+WHERE
+	r.account_sid = #{accountSid}
+AND r.device_sid IS NOT NULL
+AND LENGTH(TRIM(r.device_sid))<![CDATA[ >= ]]>1
+AND r.created_datetime BETWEEN #{startDate}
+AND #{endDate}
+ORDER BY r.created_datetime ASC;
+    </select>
 </mapper>

@@ -23,4 +23,39 @@ WHERE
 		AND `month` = #{param2}
 	)
 </select>
+
+	<select id="queryMaxMonth" resultType="java.lang.String">
+		SELECT
+	MAX(tcm.validityPeriod) AS maxMonth
+FROM
+	t_coupon_members AS tcm
+WHERE
+	tcm.memberId IN (
+		SELECT
+			tm.id
+		FROM
+			account a
+		LEFT JOIN t_member AS tm ON a.email = tm.appUser
+		WHERE
+			a.sid = #{accountSid}
+	)
+
+	</select>
+	
+	<select id="countByOrderDetail" resultType="java.lang.Integer">
+		SELECT
+	COUNT(*)
+FROM
+	t_order_detail AS tod
+WHERE
+	tod.courseTimeId IN (
+		SELECT
+			tct.id
+		FROM
+			t_course_time AS tct
+		WHERE
+			courseId = #{courseId}
+	)
+AND tod. STATUS IN (0, 1);
+	</select>
 </mapper>

@@ -2,6 +2,11 @@ package com.skytech.api.controller;
 
 import com.skytech.api.core.JsonMap;
 import com.skytech.api.core.Pagination;
+import com.skytech.api.core.utils.DateUtil;
+import com.skytech.api.mapper.AccountDeviceMapper;
+import com.skytech.api.mapper.RunningRecordMapper;
+import com.skytech.api.model.AccountDevice;
+import com.skytech.api.model.AccountDeviceExample;
 import com.skytech.api.model.RunningRecord;
 import com.skytech.api.service.RunningRecordService;
 import io.swagger.annotations.ApiImplicitParam;
@@ -15,8 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author 剑神卓凌昭
@@ -27,6 +31,8 @@ public class RunningRecordController {
     private final Logger LOGGER = LoggerFactory.getLogger(RunningRecordController.class);
     @Autowired
     private RunningRecordService runningRecordService;
+    @Autowired
+    private RunningRecordMapper runningRecordMapper;
 
     @ApiOperation(value = "列表")
     @ApiImplicitParams({
@@ -51,6 +57,57 @@ public class RunningRecordController {
         data.put("count", pagination.getTotalRowNumber());
         data.put("data", pagination.getDataList());
 
+        return data;
+    }
+
+    @ApiOperation(value = "获取指定日期运动记录")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "recordTime", value = "记录时间", required = true, dataType = "Date")
+    })
+    @GetMapping(value = "/runningRecord/listForTime")
+    public Map<String, Object> listForTime(HttpSession session, Date recordTime) {
+        Map<String, Object> data = new HashMap<>();
+        if(recordTime==null){
+            data.put("code", "2000");
+            data.put("message", "成功");
+            data.put("data", null);
+            return data;
+        }
+
+        Object accountSidObj = session.getAttribute("accountSid");
+        String accountSid = accountSidObj.toString();
+        List<RunningRecord> runningRecords = runningRecordService.findForTime(accountSid,recordTime);
+        data.put("code", "2000");
+        data.put("message", "成功");
+        data.put("count", runningRecords.size());
+        data.put("data", runningRecords);
+        return data;
+    }
+
+    @ApiOperation(value = "获取当月运动记录日期")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "month", value = "记录月份", required = true, dataType = "String")
+    })
+    @GetMapping(value = "/runningRecord/getRecordDate")
+    public Map<String, Object> getRecordDate(HttpSession session, String month) {
+        Map<String, Object> data = new HashMap<>();
+        if(month==null){
+            data.put("code", "2000");
+            data.put("message", "成功");
+            data.put("data", null);
+            return data;
+        }
+
+        Object accountSidObj = session.getAttribute("accountSid");
+        String accountSid = accountSidObj.toString();
+        String headAndEndDateForMonth = DateUtil.getHeadAndEndDateForMonth(month);
+        String startDate = headAndEndDateForMonth.split("~")[0];
+        String endDate = headAndEndDateForMonth.split("~")[1];
+        List<String> runningRecords = runningRecordMapper.getRecordDate(accountSid,startDate,endDate);
+        data.put("code", "2000");
+        data.put("message", "成功");
+        data.put("count", runningRecords.size());
+        data.put("data", runningRecords);
         return data;
     }
 
